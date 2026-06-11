@@ -5,7 +5,7 @@ This repository contains the compact experiment code and generated figures for t
 The repo is intentionally small:
 
 - `experiments/matrix_completion.py`: synthetic deep matrix-completion reproduction.
-- `experiments/stsb_fewshot_summary.py`: summary of local STS-B few-shot Deep LoRA runs.
+- `experiments/deep_lora_stsb.py`: STS-B few-shot LoRA vs. Deep LoRA fine-tuning.
 - `figs/`: generated figures used in the report and presentation.
 
 LaTeX/report sources are not required to run the experiments.
@@ -16,6 +16,12 @@ LaTeX/report sources are not required to run the experiments.
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install numpy matplotlib
+```
+
+For the STS-B experiment, install the additional model-training dependencies:
+
+```bash
+python -m pip install torch transformers datasets
 ```
 
 ## Matrix Completion
@@ -54,17 +60,21 @@ The basis-update version reached the same final-error scale as full GD with abou
 
 This script uses `gamma = 10` after local tuning, so it should be viewed as an illustrative reproduction variant rather than the exact matrix-completion hyperparameter setting from the paper.
 
-## STS-B Few-Shot Summary
+## STS-B Few-Shot Fine-Tuning
 
-Regenerate the STS-B summary figure from recorded local runs:
+Run a small smoke test:
 
 ```bash
-python experiments/stsb_fewshot_summary.py
+python experiments/deep_lora_stsb.py --samples 16 --seeds 0 --steps 5
 ```
 
-This writes `stsb_fewshot_summary.csv`, `stsb_fewshot.png`, and `stsb_fewshot.pdf` to `results/stsb_fewshot/`.
+Run the full few-shot sweep used for the report:
 
-These local runs are intended to illustrate the trend, not to exactly reproduce the paper's full BERT hyperparameter protocol. The experiment fine-tunes on small subsets of STS-B and reports Pearson correlation on the validation set.
+```bash
+python experiments/deep_lora_stsb.py --samples 16 64 256 --seeds 0 1 2 --steps 500
+```
+
+This writes `stsb_results.csv`, `stsb_fewshot.png`, and `stsb_fewshot.pdf` to `results/stsb_fewshot/`. The experiment fine-tunes BERT-base-cased on small subsets of STS-B and reports Pearson correlation on the validation set. The script implements the LoRA adapters directly, so it does not require PEFT.
 
 | Training examples | Vanilla LoRA | Deep LoRA | Gain |
 | ---: | ---: | ---: | ---: |
