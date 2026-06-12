@@ -5,6 +5,7 @@ This repository contains the compact experiment code and generated figures for t
 The repo is intentionally small:
 
 - `experiments/matrix_completion.py`: synthetic deep matrix-completion reproduction.
+- `experiments/deep_linear_recovery.py`: full-observation deep linear recovery simulation for the theorem-level dynamics.
 - `experiments/deep_lora_stsb.py`: STS-B few-shot LoRA vs. Deep LoRA fine-tuning.
 - `figs/`: generated figures used in the report and presentation.
 
@@ -23,6 +24,38 @@ For the STS-B experiment, install the additional model-training dependencies:
 ```bash
 python -m pip install torch transformers datasets
 ```
+
+## Deep Linear Recovery
+
+Regenerate the theorem-level dynamics figures:
+
+```bash
+python experiments/deep_linear_recovery.py
+```
+
+To overwrite the report figures in `figs/`:
+
+```bash
+python experiments/deep_linear_recovery.py --write-report-figs
+```
+
+Default setting:
+
+- Matrix size `d = 24`
+- Target rank `r = 2`
+- Depth `L = 3`
+- Initialization scale `epsilon = 0.25`
+- `1800` GD steps
+
+Observed result:
+
+| Quantity | Value |
+| --- | ---: |
+| Final full GD loss | `4.42e-04` |
+| Final compressed GD loss | `2.53e-05` |
+| Maximum full-vs-compressed map discrepancy | `4.88e-03` |
+
+The singular-value figure logs one full factor during GD. Only a few singular values move far from the initialization scale, while most stay close to it. The compression figure compares full GD with the fixed-basis compressed GD predicted by the theorem.
 
 ## Matrix Completion
 
